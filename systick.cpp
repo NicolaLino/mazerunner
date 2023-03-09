@@ -1,9 +1,12 @@
 #include "systick.h"
-//#include "encoders.h"
-// #include "motors.h"
-// #include "profile.h"
-// #include "sensors.h"
+#include "encoders.h"
+#include "motors.h"
+#include "profile.h"
+#include "config.h"
+#include "sensors.h"
 #include <Arduino.h>
+
+extern float cross_track_error;
 
 void setup_systick() {
   bitClear(TCCR2A, WGM20);
@@ -45,9 +48,10 @@ void setup_systick() {
 ISR(TIMER2_COMPA_vect, ISR_NOBLOCK) {
   // TODO: make sure all variables are interrupt-safe if they are used outside IRQs
   // grab the encoder values first because they will continue to change
-  // update_encoders();
-  // forward.update();
-  // rotation.update();
+  update_position();
+  forward.update();
+  rotation.update();
+  update_motors(cross_track_error, ERROR_FACTOR);
   // g_cross_track_error = update_wall_sensors();
   // g_steering_adjustment = calculate_steering_adjustment(g_cross_track_error);
   // update_motor_controllers(g_steering_adjustment);
